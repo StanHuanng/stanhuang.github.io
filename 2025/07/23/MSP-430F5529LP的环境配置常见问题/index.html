@@ -13,7 +13,7 @@
 
 
 
-<title>category | Huang&#39;s Blog</title>
+<title>MSP-430F5529LP的环境配置常见问题 | Huang&#39;s Blog</title>
 
 
 
@@ -131,7 +131,179 @@
     }
 </script>
             <div class="main">
+                <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">MSP-430F5529LP的环境配置常见问题</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Huang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 23, 2025&nbsp;&nbsp;1:31:30</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/MCU/">MCU</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><strong>问题1：无法在设备管理器中找到 MSP 的 usb 驱动，同时无法完成 CSS 内部的烧录操作</strong>****</p>
+<blockquote>
+<p>MSP430: Error initializing emulator: One of the connected MSP-FETs &#x2F; eZ-FETs debuggers needs recovery. Select ‘Recover’ to start the recovery process.  Note: Only one MSP-FET &#x2F; eZ-FET debugger can be connected to your system during recovery.<br>MSP430: Error: MSP-FET &#x2F; eZ-FET recovery failed</p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://bbs.eeworld.com.cn/thread-334052-1-1.html">win7 下 LaunchPad 驱动安装指南 - 微控制器 MCU - 电子工程世界-论坛</a></li>
+</ul>
+<p><strong>安装 usbser.sys 放至 windows&#x2F;win32&#x2F;driver 中，并替换原有文件，仍未解决</strong></p>
+<ul>
+<li><strong>禁用驱动程序强制签名模式允许安装未经过数字签名的驱动程序</strong></li>
+</ul>
+<p><strong>通过开启 windows 禁用驱动强制签名模式后，在设备管理器页面手动添加驱动 C:\Windows\System32\DriverStore\FileRepository\xds110_debug.inf_amd64_c3db6584de66afb3</strong></p>
+<p><strong>在设备管理器页面打开“显示隐藏的设备”后，发现 MSP DEBUG INTERFACE 位于 COM 端口栏，待进一步确认</strong></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
                 
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Huang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://luminghuang.com/2025/07/23/MSP-430F5529LP%E7%9A%84%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">https://luminghuang.com/2025/07/23/MSP-430F5529LP%E7%9A%84%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Don't stop, won't stop, never stop.</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/DEBUG/"># DEBUG</a>
+                    
+                        <a href="/tags/MSP430F5529/"># MSP430F5529</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2025/07/22/%E3%80%90%E8%BD%AC%E3%80%91Vivado%E4%B8%ADFFT-IP%E6%A0%B8%E7%9A%84%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE/">【转】Vivado中FFT IP核的基本配置</a>
+            
+        </section>
+
+        <!-- Giscus 评论区挂载点 -->
+<div id="giscus-container" style="margin-top: 2.5rem;"></div>
+
+<!-- Giscus 动态加载脚本：初始加载 + 明暗主题切换 -->
+<script>
+  function createGiscus(theme) {
+    const giscusContainer = document.getElementById('giscus-container');
+    if (!giscusContainer) return;
+
+    // 清除旧的评论 iframe
+    giscusContainer.innerHTML = '';
+
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+
+    // 替换为你的 GitHub 仓库信息（格式：username/repo）
+    script.setAttribute('data-repo', 'StanHuanng/stanhuang.github.io');
+
+   // 替换为你的 repo-id 和 category-id（在 giscus.app 配置页面生成）
+    script.setAttribute('data-repo-id', 'R_kgDOPPSsDg');
+    script.setAttribute('data-category', 'Announcements');
+    script.setAttribute('data-category-id', 'DIC_kwDOPPSsDs4CtPSj');
+
+    // 其他常规推荐设置
+    script.setAttribute('data-mapping', 'pathname');           // 用页面路径匹配评论帖
+    script.setAttribute('data-strict', '0');                   // 若无匹配帖则创建新帖
+    script.setAttribute('data-reactions-enabled', '1');        // 启用表情反应
+    script.setAttribute('data-emit-metadata', '0');            // 不输出元数据
+    script.setAttribute('data-input-position', 'top');         // 输入框在评论上方
+    script.setAttribute('data-theme', theme);                
+    script.setAttribute('data-lang', 'zh-CN');                 // 中文界面
+    script.setAttribute('crossorigin', 'anonymous');           // 跨域资源安全
+    script.async = true;                                       
+     
+    giscusContainer.appendChild(script);
+  }
+
+  function getCurrentTheme() {
+    return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 页面首次加载，根据当前主题挂载评论
+    createGiscus(getCurrentTheme());
+
+    // 监听按钮点击切换主题 → 重载评论区
+    const buttons = [
+      document.querySelector('.toggleBtn'),
+      document.getElementById('mobile-toggle-theme')
+    ];
+    buttons.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          createGiscus(getCurrentTheme());
+        }, 400); // 稍作延迟，确保 class 切换完毕
+      });
+    });
+
+    // 监听 body class 改变（保险方案）
+    const observer = new MutationObserver(() => {
+      createGiscus(getCurrentTheme());
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  });
+</script>
+
+    </article>
+</div>
+
 <script>
 !
 function() {
@@ -235,78 +407,6 @@ if (toggleMobile) {
     100)
 } ();
 </script>  
-
-
-    <div class="container">
-        <div class="post-wrap categories">
-            <h2 class="post-title">-&nbsp;Categories&nbsp;-</h2>
-            <div class="categories-card">
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/FPGA/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    FPGA
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/20/%E5%9F%BA%E4%BA%8ETJC4832T135-011C%E7%9A%84FPGA%E9%80%9A%E4%BF%A1%E6%98%BE%E7%A4%BA/">基于TJC4832T135_011C的FPGA通信显示</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/21/%E7%94%B5%E8%B5%9B%E5%8D%81%E6%97%A5%E8%AE%B0%EF%BC%9ADDS%E4%B8%8EFFT%E7%9A%84%E5%88%9D%E8%AF%86/">电赛十日记：DDS与FFT的初识</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/22/%E3%80%90%E8%BD%AC%E3%80%91Vivado%E4%B8%ADFFT-IP%E6%A0%B8%E7%9A%84%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE/">【转】Vivado中FFT IP核的基本配置</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/MCU/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    MCU
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/23/MSP-430F5529LP%E7%9A%84%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">MSP-430F5529LP的环境配置常见问题</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-            </div>
-
-        </div>
-    </div>
-
             </div>
             <footer id="footer" class="footer">
     <div class="copyright">

@@ -228,8 +228,9 @@
         </header>
 
         <div class="post-content">
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
-<p>本文章引用自<a target="_blank" rel="noopener" href="https://www.cnblogs.com/lgy-gdeu/p/11590626.html">vivado 的 IFFT&#x2F;FFT IP 核的配置及调用 - 柯西恒等式 - 博客园</a></p>
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在进行FFT IP核的配置学习中遇到较多难题，借助本文的整理可以对其有个大概的了解</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lgy-gdeu/p/11590626.html">vivado 的 IFFT&#x2F;FFT IP 核的配置及调用 - 柯西恒等式 - 博客园</a></p>
 </blockquote>
 <p>对于 viavado 中 IFFT IP 的使用刚开始的时候，没有找到 IFFT 的 IP,最后经过查找资料发现，在 VIVADO 中 FFT IP 和 IFFT IP 是用的统一个 IP，具体是 IFFT 还是 FFT 通过设 s_axis_config_tdata&#x3D;1&#x2F;0 设置 fft 或 ifft 模式，而且在同一个工程当中，尽量选择同一个 IP 多次例化使用。</p>
 <h1 id="第一页"><a href="#第一页" class="headerlink" title="第一页"></a>第一页</h1><p>第一个标签页里主要配置通道数，点数，时钟，吞吐量，结构，以及是否可以运行时配置，需要注意的是结构的配置会影响调整因子。如下图所示：</p>
@@ -252,10 +253,8 @@
 <h1 id="第二页"><a href="#第二页" class="headerlink" title="第二页"></a>第二页</h1><p>第二配置页主要是数据宽度，格式，控制信号，输出方式，和可选的控制信号。需要注意的是输据的输入是自然方式（Natural Order）,输出可以是自然方式也可以是倒序方式（Reversed Order）</p>
 <p>如果选用倒序方式输出，在后面处理中就要注意这一特性。  其中在 data format;下拉标签中，对应着 FFT IP 核支持两种数据类型：</p>
 <ol>
-<li><p>定点全精度</p>
-</li>
-<li><p>定点缩减位宽</p>
-</li>
+<li>定点全精度</li>
+<li>定点缩减位宽</li>
 </ol>
 <h2 id="scaling-optios-缩放选项-："><a href="#scaling-optios-缩放选项-：" class="headerlink" title="scaling optios : 缩放选项 ："></a>scaling optios : 缩放选项 ：</h2><p>1、 block floating point :不管输入的格式如何，FFT 变化内部都采用浮点，会根据每一级的的数据情况自动缩放，是的数据不出现溢出的情况，</p>
 <p>2、scaled :在 m_axis_data_tuser 中会有 5BIT 表示每一级的缩放情况,在 s_axis_config_data 中会有相应的字段配置配置缩放因子.每一级别包含 2 个 stage ，2 个 bit 表示一级缩放，一般 0-3 可选，如果 log(NFFT)不是 2 的倍数，则最高一级的缩放只能在 0-1 之间选取。</p>
@@ -268,33 +267,21 @@
 <p><a href="https://"><br><img src="/images/1777685-20190926161942276-479882726.png" alt="1777685-20190926161942276-479882726.png">
 </a></p>
 <h1 id="关于端口的说明"><a href="#关于端口的说明" class="headerlink" title="关于端口的说明"></a>关于端口的说明</h1><ul>
-<li><p>s_axis_config_tdata：控制输入模式，进行 fft&#x2F;ifft 以及衰减因子的设置，第 0 位为 1fft，为 0 做 ifft，高位用于 scale 因子的设置。</p>
-</li>
-<li><p>s_axis_config_tvalid:拉高若干个时钟周期后归零，之后将 s_axis_data_tvalid 拉高</p>
-</li>
-<li><p>s_axis_config_tready:s_axis_config_tvalid 拉高两个时钟周期后，该口给 1 输出；</p>
-</li>
-<li><p>s_axis_data_tready：s_axis_config_tvalid 拉高两个时钟周期后，该口给 1 输出，ip 核初始化完成，可进行数据输入必须进行赋值；</p>
-</li>
-<li><p>s_axis_data_tvalid：拉高 2048 个周期，输入 2048 个数据进行 fft；</p>
-</li>
-<li><p>s_axis_data_tdata：输入 32 位数据，取低 12 位数据进行运算；</p>
-</li>
-<li><p>s_axis_data_tlast：输入 2048 个数据后拉高，停止数据输入；</p>
-</li>
+<li>s_axis_config_tdata：控制输入模式，进行 fft&#x2F;ifft 以及衰减因子的设置，第 0 位为 1fft，为 0 做 ifft，高位用于 scale 因子的设置。</li>
+<li>s_axis_config_tvalid:拉高若干个时钟周期后归零，之后将 s_axis_data_tvalid 拉高</li>
+<li>s_axis_config_tready:s_axis_config_tvalid 拉高两个时钟周期后，该口给 1 输出；</li>
+<li>s_axis_data_tready：s_axis_config_tvalid 拉高两个时钟周期后，该口给 1 输出，ip 核初始化完成，可进行数据输入必须进行赋值；</li>
+<li>s_axis_data_tvalid：拉高 2048 个周期，输入 2048 个数据进行 fft；</li>
+<li>s_axis_data_tdata：输入 32 位数据，取低 12 位数据进行运算；</li>
+<li>s_axis_data_tlast：输入 2048 个数据后拉高，停止数据输入；</li>
 </ul>
 <p>做 fft 需要耗费的时钟周期计算如下 s_axis_data_tlast- s_axis_data_tvalid，在 ip 核中可看到：</p>
 <ul>
-<li><p>m_axis_data_tdata：高位为实部，低位为虚部，由于本程序在 always 内将值给 fft_real 端口，所以会延迟一个时钟周期，实际为 41，fft_real 为 42；</p>
-</li>
-<li><p>m_axis_data_tvalid：当 fft 结果输出时拉高，输出 2048 个点的数据后拉低；</p>
-</li>
-<li><p>m_axis_data_tuser：输出 fft 的地址值，输出值*fs&#x2F;N 为对应频点；</p>
-</li>
-<li><p>m_axis_data_tready：完成 2048 个点的 fft 后拉高一个时钟周期表示完成 fft；</p>
-</li>
-<li><p>event_frame_started:输入信号数据时拉高一个时钟周期；</p>
-</li>
+<li>m_axis_data_tdata：高位为实部，低位为虚部，由于本程序在 always 内将值给 fft_real 端口，所以会延迟一个时钟周期，实际为 41，fft_real 为 42；</li>
+<li>m_axis_data_tvalid：当 fft 结果输出时拉高，输出 2048 个点的数据后拉低；</li>
+<li>m_axis_data_tuser：输出 fft 的地址值，输出值*fs&#x2F;N 为对应频点；</li>
+<li>m_axis_data_tready：完成 2048 个点的 fft 后拉高一个时钟周期表示完成 fft；</li>
+<li>event_frame_started:输入信号数据时拉高一个时钟周期；</li>
 </ul>
 
         </div>
@@ -348,6 +335,8 @@
             </div>
         </section>
         <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2025/07/23/MSP-430F5529LP%E7%9A%84%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">MSP-430F5529LP的环境配置常见问题</a>
             
             
             <a class="next" rel="next" href="/2025/07/21/%E7%94%B5%E8%B5%9B%E5%8D%81%E6%97%A5%E8%AE%B0%EF%BC%9ADDS%E4%B8%8EFFT%E7%9A%84%E5%88%9D%E8%AF%86/">电赛十日记：DDS与FFT的初识</a>
