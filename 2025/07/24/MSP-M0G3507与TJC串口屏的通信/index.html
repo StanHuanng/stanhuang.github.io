@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Huang">
+
+
+
+
+
+<title>MSP-M0G3507与TJC串口屏的通信 | Huang&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/new.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+ 
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Huang&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">Me</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Huang&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">Me</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">MSP-M0G3507与TJC串口屏的通信</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Huang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 24, 2025&nbsp;&nbsp;14:27:55</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/MCU/">MCU</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="串口通信"><a href="#串口通信" class="headerlink" title="串口通信"></a>串口通信</h1><p>串口是指外设和处理器之间通过数据信号线、地线和控制线等，按位进行传输数据的一种通讯方式。尽管传输速度比并行传输低。但串口可以在使用一根线发送数据的同时用另一根线接收数据。 这种通信方式使用的数据线少，在远距离通信中可以节约通信成本。串口通信最重要的参数是波特率、数据位、停止位和奇偶校验位，这些参数在两个通信端口之间必须一致。</p>
+<p>串口工作模式分为三种：单工、全双工模式和半双工模式。</p>
+<ul>
+<li>单工：在通信的任意时刻，信息只能由 A 传到 B，或 B 传到 A；</li>
+<li>半双工：在通信的任意时刻，信息即可由 A 传到 B，又能由 B 传到 A，但同时只能有一个方向上的传输存在；</li>
+<li>全双工：在通信的任意时刻，通信线路上存在 A 到 B 和 B 到 A 的双向信号传输；</li>
+</ul>
+<h1 id="串口通信协议"><a href="#串口通信协议" class="headerlink" title="串口通信协议"></a>串口通信协议</h1><p>串口通信协议定义了在串口上进行数据交换的规则和格式。常见的串口通信协议包括 ASCII 协议、Modbus 协议、RS-232 协议等。协议规定了数据的帧结构、数据格式、校验方式等，确保发送和接收双方按照相同的规则进行数据交换，从而实现数据的正确传输和解析。</p>
+<p>串口通信是一位一位地传输，每传输一个字符总是以起始位开始，以停止位结束，字符之间没有固定的时间间隔要求。每一个字符的前面都有一位起始位（低电平），后面由 7 位数据位组成，接着是一位校验位，最后是停止位。停止位后面是不定长的空闲位，停止位和空闲位都规定为高电平。</p>
+<p><img src="/images/uart.png" alt="uart.png"></p>
+<h1 id="单片机端设置"><a href="#单片机端设置" class="headerlink" title="单片机端设置"></a>单片机端设置</h1><p>对于串口通信来说，发挥主要作用的便是串口中断函数，在接收到数据后，系统便会自动执行串口中断函数中的内容，下面是一个简单实现接收数据的串口中断程序</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">UART_0_INST_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// 如果产生了串口中断</span></span><br><span class="line">	<span class="keyword">switch</span> (<span class="built_in">DL_UART_Main_getPendingInterrupt</span>(UART_0_INST))</span><br><span class="line">	&#123;</span><br><span class="line">	<span class="keyword">case</span> DL_UART_MAIN_IIDX_RX: <span class="comment">// 如果是接收中断</span></span><br><span class="line">		<span class="comment">// 接发送过来的数据保存在变量中</span></span><br><span class="line">		uart_data = <span class="built_in">DL_UART_Main_receiveData</span>(UART_0_INST);</span><br><span class="line">		<span class="comment">// 将保存的数据再发送出去</span></span><br><span class="line">		<span class="comment">// uart0_send_char(uart_data);</span></span><br><span class="line">		<span class="built_in">writeRingBuff</span>(uart_data);</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">default</span>: <span class="comment">// 其他的串口中断</span></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>储存串口传输的数据的变量定义在代码前端</p>
+<blockquote>
+<p><code>volatile uint8_t uart_data = 0;</code></p>
+</blockquote>
+<p>这样，通过在main函数中启用中断，便可以实现最简单的串口中断调用</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 清除串口中断标志</span></span><br><span class="line"><span class="built_in">NVIC_ClearPendingIRQ</span>(UART_0_INST_INT_IRQN);</span><br><span class="line"><span class="comment">// 使能串口中断</span></span><br><span class="line"><span class="built_in">NVIC_EnableIRQ</span>(UART_0_INST_INT_IRQN);</span><br></pre></td></tr></table></figure>
+
+<h1 id="TJC串口屏端"><a href="#TJC串口屏端" class="headerlink" title="TJC串口屏端"></a>TJC串口屏端</h1><p>淘晶驰串口屏的配置可以通过引入tjc_usart_hmi.c文件大幅简化开发流程，该官方提供的头文件中包含了基本的字符、字符串、以及环形缓冲区的设定</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/driverlib/dl_uart_main.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;ti_msp_dl_config.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tjc_usart_hmi.h&quot;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdarg.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stddef.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STR_LENGTH 100</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">uint16_t</span> Head;</span><br><span class="line">	<span class="type">uint16_t</span> Tail;</span><br><span class="line">	<span class="type">uint16_t</span> Lenght;</span><br><span class="line">	<span class="type">uint8_t</span>  Ring_data[RINGBUFF_LEN];</span><br><span class="line">&#125;RingBuff_t;</span><br><span class="line"></span><br><span class="line">RingBuff_t ringBuff;	<span class="comment">//创建一个ringBuff的缓冲区</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//串口0发送单个字符</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">uart0_send_char</span><span class="params">(<span class="type">char</span> ch)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//当串口0忙的时候等待，不忙的时候再发送传进来的字符</span></span><br><span class="line">    <span class="keyword">while</span>( <span class="built_in">DL_UART_isBusy</span>(UART_0_INST) == <span class="literal">true</span> );</span><br><span class="line">    <span class="comment">//发送单个字符</span></span><br><span class="line">    <span class="built_in">DL_UART_Main_transmitData</span>(UART_0_INST, ch);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//串口0发送字符串</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">uart0_send_string</span><span class="params">(<span class="type">char</span>* str)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//当前字符串地址不在结尾 并且 字符串首地址不为空</span></span><br><span class="line">    <span class="keyword">while</span>(*str!=<span class="number">0</span>&amp;&amp;str!=<span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//发送字符串首地址中的字符，并且在发送完成之后首地址自增</span></span><br><span class="line">        <span class="built_in">uart0_send_char</span>(*str++);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//串口发送字符串和结束符</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">tjc_send_string</span><span class="params">(<span class="type">char</span>* str)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//当前字符串地址不在结尾 并且 字符串首地址不为空</span></span><br><span class="line">    <span class="keyword">while</span>(*str!=<span class="number">0</span>&amp;&amp;str!=<span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//发送字符串首地址中的字符，并且在发送完成之后首地址自增</span></span><br><span class="line">        <span class="built_in">uart0_send_char</span>(*str++);</span><br><span class="line">    &#125;</span><br><span class="line">		<span class="built_in">uart0_send_char</span>(<span class="number">0xff</span>);</span><br><span class="line">		<span class="built_in">uart0_send_char</span>(<span class="number">0xff</span>);</span><br><span class="line">		<span class="built_in">uart0_send_char</span>(<span class="number">0xff</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	TJC_SendData</span></span><br><span class="line"><span class="comment">作者：  </span></span><br><span class="line"><span class="comment">日期：    	2024.08.18</span></span><br><span class="line"><span class="comment">功能：    	向串口打印数据,需要制定发送的字符串长度</span></span><br><span class="line"><span class="comment">输入参数：</span></span><br><span class="line"><span class="comment">返回值： 	</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TJC_SendData</span><span class="params">(<span class="type">uint8_t</span> *data, <span class="type">uint16_t</span> len)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(len--)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//等待发送数据寄存器为空</span></span><br><span class="line">	</span><br><span class="line">		<span class="built_in">uart0_send_char</span>(*data++);</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	TJCPrintf</span></span><br><span class="line"><span class="comment">作者：    	wwd</span></span><br><span class="line"><span class="comment">日期：    	2022.10.08</span></span><br><span class="line"><span class="comment">功能：    	向串口打印数据,使用前请将USART_SCREEN_write这个函数改为你的单片机的串口发送单字节函数</span></span><br><span class="line"><span class="comment">输入参数：	0参考printf</span></span><br><span class="line"><span class="comment">返回值： 		打印到串口的数量</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TJCPrintf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, ...)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="type">uint8_t</span> end = <span class="number">0xff</span>;</span><br><span class="line">	<span class="type">char</span> buffer[STR_LENGTH<span class="number">+1</span>];  <span class="comment">// 数据长度</span></span><br><span class="line">	va_list arg_ptr;</span><br><span class="line">	<span class="built_in">va_start</span>(arg_ptr, str);</span><br><span class="line">	<span class="type">int</span> len = <span class="built_in">vsnprintf</span>(buffer, STR_LENGTH<span class="number">+1</span>, str, arg_ptr);</span><br><span class="line">	<span class="built_in">va_end</span>(arg_ptr);</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">uart0_send_char</span>(buffer[i]);</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">uart0_send_char</span>(end);			<span class="comment">//这个函数改为你的单片机的串口发送单字节函数</span></span><br><span class="line">	<span class="built_in">uart0_send_char</span>(end);			<span class="comment">//这个函数改为你的单片机的串口发送单字节函数</span></span><br><span class="line">	<span class="built_in">uart0_send_char</span>(end);			<span class="comment">//这个函数改为你的单片机的串口发送单字节函数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	initRingBuff</span></span><br><span class="line"><span class="comment">作者：</span></span><br><span class="line"><span class="comment">日期：    	2022.10.08</span></span><br><span class="line"><span class="comment">功能：    	初始化环形缓冲区</span></span><br><span class="line"><span class="comment">输入参数：</span></span><br><span class="line"><span class="comment">返回值： 		void</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">initRingBuff</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="comment">//初始化相关信息</span></span><br><span class="line">  ringBuff.Head = <span class="number">0</span>;</span><br><span class="line">  ringBuff.Tail = <span class="number">0</span>;</span><br><span class="line">  ringBuff.Lenght = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	writeRingBuff</span></span><br><span class="line"><span class="comment">作者：</span></span><br><span class="line"><span class="comment">日期：    	2022.10.08</span></span><br><span class="line"><span class="comment">功能：    	往环形缓冲区写入数据</span></span><br><span class="line"><span class="comment">输入参数：</span></span><br><span class="line"><span class="comment">返回值： 		void</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">writeRingBuff</span><span class="params">(<span class="type">uint8_t</span> data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(ringBuff.Lenght &gt;= RINGBUFF_LEN) <span class="comment">//判断缓冲区是否已满</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">  &#125;</span><br><span class="line">  ringBuff.Ring_data[ringBuff.Tail]=data;</span><br><span class="line">  ringBuff.Tail = (ringBuff.Tail<span class="number">+1</span>)%RINGBUFF_LEN;<span class="comment">//防止越界非法访问</span></span><br><span class="line">  ringBuff.Lenght++;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	deleteRingBuff</span></span><br><span class="line"><span class="comment">作者：</span></span><br><span class="line"><span class="comment">日期：    	2022.10.08</span></span><br><span class="line"><span class="comment">功能：    	删除串口缓冲区中相应长度的数据</span></span><br><span class="line"><span class="comment">输入参数：		要删除的长度</span></span><br><span class="line"><span class="comment">返回值： 		void</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">deleteRingBuff</span><span class="params">(<span class="type">uint16_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(size &gt;= ringBuff.Lenght)</span><br><span class="line">	&#123;</span><br><span class="line">	    <span class="built_in">initRingBuff</span>();</span><br><span class="line">	    <span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; i++)</span><br><span class="line">	&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span>(ringBuff.Lenght == <span class="number">0</span>)<span class="comment">//判断非空</span></span><br><span class="line">		&#123;</span><br><span class="line">		<span class="built_in">initRingBuff</span>();</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		ringBuff.Head = (ringBuff.Head<span class="number">+1</span>)%RINGBUFF_LEN;<span class="comment">//防止越界非法访问</span></span><br><span class="line">		ringBuff.Lenght--;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	read1BFromRingBuff</span></span><br><span class="line"><span class="comment">作者：</span></span><br><span class="line"><span class="comment">日期：    	2022.10.08</span></span><br><span class="line"><span class="comment">功能：    	从串口缓冲区读取1字节数据</span></span><br><span class="line"><span class="comment">输入参数：		position:读取的位置</span></span><br><span class="line"><span class="comment">返回值： 		所在位置的数据(1字节)</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"><span class="function"><span class="type">uint8_t</span> <span class="title">read1BFromRingBuff</span><span class="params">(<span class="type">uint16_t</span> position)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">uint16_t</span> realPosition = (ringBuff.Head + position) % RINGBUFF_LEN;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ringBuff.Ring_data[realPosition];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	getRingBuffLenght</span></span><br><span class="line"><span class="comment">作者：</span></span><br><span class="line"><span class="comment">日期：    	2022.10.08</span></span><br><span class="line"><span class="comment">功能：    	获取串口缓冲区的数据数量</span></span><br><span class="line"><span class="comment">输入参数：</span></span><br><span class="line"><span class="comment">返回值： 		串口缓冲区的数据数量</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"><span class="function"><span class="type">uint16_t</span> <span class="title">getRingBuffLenght</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> ringBuff.Lenght;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/********************************************************</span></span><br><span class="line"><span class="comment">函数名：  	isRingBuffOverflow</span></span><br><span class="line"><span class="comment">作者：</span></span><br><span class="line"><span class="comment">日期：    	2022.10.08</span></span><br><span class="line"><span class="comment">功能：    	判断环形缓冲区是否已满</span></span><br><span class="line"><span class="comment">输入参数：</span></span><br><span class="line"><span class="comment">返回值： 		1:环形缓冲区已满 , 2:环形缓冲区未满</span></span><br><span class="line"><span class="comment">修改记录：</span></span><br><span class="line"><span class="comment">**********************************************************/</span></span><br><span class="line"><span class="function"><span class="type">uint8_t</span> <span class="title">isRingBuffOverflow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> ringBuff.Lenght == RINGBUFF_LEN;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Huang</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Don't stop, won't stop, never stop.</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/TFT-LCD/"># TFT-LCD</a>
+                    
+                        <a href="/tags/USART/"># USART</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2025/07/23/MSP-430F5529LP%E7%9A%84%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">MSP-430F5529LP的环境配置常见问题</a>
+            
+        </section>
+
+        <!-- Giscus 评论区挂载点 -->
+<div id="giscus-container" style="margin-top: 2.5rem;"></div>
+
+<!-- Giscus 动态加载脚本：初始加载 + 明暗主题切换 -->
+<script>
+  function createGiscus(theme) {
+    const giscusContainer = document.getElementById('giscus-container');
+    if (!giscusContainer) return;
+
+    // 清除旧的评论 iframe
+    giscusContainer.innerHTML = '';
+
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+
+    // 替换为你的 GitHub 仓库信息（格式：username/repo）
+    script.setAttribute('data-repo', 'StanHuanng/stanhuang.github.io');
+
+   // 替换为你的 repo-id 和 category-id（在 giscus.app 配置页面生成）
+    script.setAttribute('data-repo-id', 'R_kgDOPPSsDg');
+    script.setAttribute('data-category', 'Announcements');
+    script.setAttribute('data-category-id', 'DIC_kwDOPPSsDs4CtPSj');
+
+    // 其他常规推荐设置
+    script.setAttribute('data-mapping', 'pathname');           // 用页面路径匹配评论帖
+    script.setAttribute('data-strict', '0');                   // 若无匹配帖则创建新帖
+    script.setAttribute('data-reactions-enabled', '1');        // 启用表情反应
+    script.setAttribute('data-emit-metadata', '0');            // 不输出元数据
+    script.setAttribute('data-input-position', 'top');         // 输入框在评论上方
+    script.setAttribute('data-theme', theme);                
+    script.setAttribute('data-lang', 'zh-CN');                 // 中文界面
+    script.setAttribute('crossorigin', 'anonymous');           // 跨域资源安全
+    script.async = true;                                       
+     
+    giscusContainer.appendChild(script);
+  }
+
+  function getCurrentTheme() {
+    return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 页面首次加载，根据当前主题挂载评论
+    createGiscus(getCurrentTheme());
+
+    // 监听按钮点击切换主题 → 重载评论区
+    const buttons = [
+      document.querySelector('.toggleBtn'),
+      document.getElementById('mobile-toggle-theme')
+    ];
+    buttons.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          createGiscus(getCurrentTheme());
+        }, 400); // 稍作延迟，确保 class 切换完毕
+      });
+    });
+
+    // 监听 body class 改变（保险方案）
+    const observer = new MutationObserver(() => {
+      createGiscus(getCurrentTheme());
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  });
+</script>
+
+    </article>
+</div>
+
+
+<script>
+!
+function() {
+    function n(n, e, t) {
+        return n.getAttribute(e) || t
+    }
+    function e(n) {
+        return document.getElementsByTagName(n)
+    }
+    function t() {
+        var t = e("script"),
+        o = t.length,
+        i = t[o - 1];
+
+        const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+        if(theme==="dark")
+            color = "255,255,255";
+        else
+            color = "0,0,0";
+
+        return {
+            l: o,
+            z: n(i, "zIndex", -1),     //置于主页面背后
+            o: n(i, "opacity", .5),     //线条透明度
+            c: n(i, "color", color),  //线条颜色
+            n: n(i, "count", 100)    //线条数量
+        }
+    }
+    function o() {
+        a = m.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+        c = m.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+    }
+    function i() {
+        r.clearRect(0, 0, a, c);
+        var n, e, t, o, m, l;
+        s.forEach(function(i, x) {
+            for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 : 1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1, 1), e = x + 1; e < u.length; e++) n = u[e],
+            null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o, i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t / 2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y), r.lineTo(n.x, n.y), r.stroke()))
+        }),
+        x(i)
+    }
+    var a, c, u, m = document.createElement("canvas"),
+    d = t(),
+    l = "c_n" + d.l,
+    r = m.getContext("2d"),
+    x = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+    function(n) {
+        window.setTimeout(n, 1e3 / 45)
+    },
+    w = Math.random,
+    y = {
+        x: null,
+        y: null,
+        max: 2e4
+    };
+    m.id = l,
+    m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z + ";opacity:" + d.o,
+    e("body")[0].appendChild(m),
+    o(),
+    window.onresize = o,
+    window.onmousemove = function(n) {
+        n = n || window.event,
+        y.x = n.clientX,
+        y.y = n.clientY
+    },
+    window.onmouseout = function() {
+        y.x = null,
+        y.y = null
+    };
+    for (var s = [], f = 0; d.n > f; f++) {
+       const toggleDesktop = document.querySelector('label[for="switch_default"]');
+const toggleMobile = document.querySelector('#mobile-toggle-theme');
+
+if (toggleDesktop) {
+    toggleDesktop.addEventListener('click', function() {
+        location.reload();
+    });
+}
+
+if (toggleMobile) {
+    toggleMobile.addEventListener('click', function() {
+        location.reload();
+    });
+}
+        var h = w() * a,
+        g = w() * c,
+        v = 2 * w() - 1,
+        p = 2 * w() - 1;
+        s.push({
+            x: h,
+            y: g,
+            xa: v,
+            ya: p,
+            max: 6e3
+        })
+    }
+    u = s.concat([y]),
+    setTimeout(function() {
+        i()
+    },
+    100)
+} ();
+</script>  
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Huang</span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
