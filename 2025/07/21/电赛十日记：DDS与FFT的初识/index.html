@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Huang">
+
+
+
+
+
+<title>电赛十日记：DDS与FFT的初识 | Huang&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/new.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Huang&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">Me</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Huang&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/category">Categories</a>
+                
+                <a class="menu-item" href="/tag">Tags</a>
+                
+                <a class="menu-item" href="/about">Me</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">电赛十日记：DDS与FFT的初识</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Huang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 21, 2025&nbsp;&nbsp;10:16:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/FPGA/">FPGA</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-DDS的快速上手"><a href="#1-DDS的快速上手" class="headerlink" title="1. DDS的快速上手"></a>1. DDS的快速上手</h1><p>DDS（直接数字频率合成器）作为电子设计竞赛中信号生成类题目最常用的核心工具，凭借其频率切换速度快、精度高、相位可控等优势，在波形生成、频率调制等场景中占据不可替代的地位。借助 Digital-IDE（DIDE）的自建 IP 库及配套视频教程，开发者可在 VS Code 环境中高效完成 DDS IP 核的调用与参数配置，显著提升开发效率。</p>
+<p>[<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ftXnYfEu1/?spm_id_from=333.1391.0.0&vd_source=fda0dd518b3bd66f8fa2cfb744de8a19">在 vscode 下用 DIDE 优雅的使用 vivado || All your need for FPGA&amp;IC: Digital-IDE v0.4.3_哔哩哔哩_bilibili</a>]</p>
+<p>[<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1u3EDzXEaz/?spm_id_from=333.1387.homepage.video_card.click&vd_source=fda0dd518b3bd66f8fa2cfb744de8a19">DIDE 自建 IP 库之 DDS 讲解_哔哩哔哩_bilibili</a>]</p>
+<p>在导入 DDS 库及相关模块文件后，核心工作是配置 DDS 的两个关键参数 ——<strong>频率控制字（PINC）</strong> 和<strong>相位控制字（PHASE_OFFSET，简称 POOF）</strong>，两者的计算公式及物理意义如下：</p>
+<p><strong>PINC &#x3D; (生成频率*2^PWIDTH)&#x2F;主频</strong></p>
+<p><strong>输出频率&#x3D; （FREQ_WORD *时钟频率) &#x2F; 2 的相位累加器位宽次方</strong></p>
+<p>通过上述参数的准确配置，DDS 可稳定输出高精度、高灵活性的波形信号，满足电子设计竞赛中对信号源的多样化需求。</p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><p>在本次代码中，设置输出数据位宽为12，相位累加器位宽为32</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> DDS #(</span><br><span class="line">        <span class="comment">// Output signal width.</span></span><br><span class="line">        <span class="keyword">parameter</span> OUTPUT_WIDTH = <span class="number">12</span>,</span><br><span class="line">        <span class="comment">// Phase width.</span></span><br><span class="line">        <span class="keyword">parameter</span> PHASE_WIDTH  = <span class="number">32</span></span><br><span class="line">    ) (</span><br><span class="line">        <span class="comment">// Clock input</span></span><br><span class="line">        <span class="keyword">input</span>                       clock,</span><br><span class="line">        <span class="comment">// Asynchronous reset with active high</span></span><br><span class="line">        <span class="keyword">input</span>                       reset, </span><br><span class="line"></span><br><span class="line">        <span class="comment">// Frequency control word.</span></span><br><span class="line">        <span class="comment">// (out clk frequency * 2^PHASE_WIDTH)/clock frequency</span></span><br><span class="line">        <span class="keyword">input</span>  [PHASE_WIDTH-<span class="number">1</span> : <span class="number">0</span>]  fre_word, </span><br><span class="line">    </span><br><span class="line">        <span class="comment">// Phase control word.</span></span><br><span class="line">        <span class="comment">// (out phase * 2^PHASE_WIDTH) / (clock frequency * 360°)</span></span><br><span class="line">        <span class="keyword">input</span>  [PHASE_WIDTH-<span class="number">1</span> : <span class="number">0</span>]  pha_word, </span><br><span class="line"></span><br><span class="line">        <span class="comment">// Out Sine wave.</span></span><br><span class="line">        <span class="keyword">output</span> [OUTPUT_WIDTH-<span class="number">1</span> : <span class="number">0</span>] wave_sin</span><br><span class="line">    ); </span><br><span class="line"></span><br><span class="line">    <span class="keyword">wire</span> [PHASE_WIDTH-<span class="number">1</span>:<span class="number">0</span>] Q;</span><br><span class="line"></span><br><span class="line">    accuml #(</span><br><span class="line">        <span class="variable">.WIDTH</span> 		( PHASE_WIDTH 		))</span><br><span class="line">    u_accuml(</span><br><span class="line">        <span class="comment">//ports</span></span><br><span class="line">        <span class="variable">.clock</span>   		( clock   		),</span><br><span class="line">        <span class="variable">.reset</span>   		( reset   		),</span><br><span class="line">        <span class="variable">.clr</span>     		( <span class="number">1&#x27;b0</span>     		),</span><br><span class="line">        <span class="variable">.add_sub</span> 		( <span class="number">1&#x27;b0</span>  		),</span><br><span class="line">        <span class="variable">.D</span>       		( fre_word      ),</span><br><span class="line">        <span class="variable">.Q</span>       		( Q       		)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">reg</span> [PHASE_WIDTH-<span class="number">1</span>:<span class="number">0</span>] phase;</span><br><span class="line">    <span class="keyword">always</span> @(<span class="keyword">posedge</span> clock <span class="keyword">or</span> <span class="keyword">posedge</span> reset) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">            phase &lt;= <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">            phase &lt;= Q + pha_word;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">reg</span> [<span class="number">9</span>:<span class="number">0</span>] addr;</span><br><span class="line">    <span class="keyword">always</span> @(<span class="keyword">posedge</span> clock <span class="keyword">or</span> <span class="keyword">posedge</span> reset) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">            addr &lt;= <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">            addr &lt;= phase[PHASE_WIDTH-<span class="number">1</span>:PHASE_WIDTH-<span class="number">10</span>];</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">wire</span> [<span class="number">15</span>:<span class="number">0</span>]	douta;</span><br><span class="line">    Sin u_Sin(</span><br><span class="line">        <span class="comment">//ports</span></span><br><span class="line">        <span class="variable">.clka</span>  		( clock  		),</span><br><span class="line">        <span class="variable">.rsta</span>  		( reset  		),</span><br><span class="line">        <span class="variable">.addra</span> 		( addr  		),</span><br><span class="line">        <span class="variable">.douta</span> 		( douta 		)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">assign</span> wave_sin = douta &gt;&gt;&gt; (<span class="number">16</span>-OUTPUT_WIDTH);</span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+
+<p>同时，为测试双路输入信号的相加，设计了加法器模块，将输入信号位宽设置为12</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> adder #(</span><br><span class="line">        <span class="comment">// Input/Output signal width.</span></span><br><span class="line">        <span class="keyword">parameter</span> DATA_WIDTH = <span class="number">12</span></span><br><span class="line">    ) (</span><br><span class="line">        <span class="comment">// Clock input</span></span><br><span class="line">        <span class="keyword">input</span>                        clock,</span><br><span class="line">        <span class="comment">// Asynchronous reset with active high</span></span><br><span class="line">        <span class="keyword">input</span>                        reset,</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// First sine wave input</span></span><br><span class="line">        <span class="keyword">input</span>  [DATA_WIDTH-<span class="number">1</span> : <span class="number">0</span>]    sin_wave1,</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// Second sine wave input  </span></span><br><span class="line">        <span class="keyword">input</span>  [DATA_WIDTH-<span class="number">1</span> : <span class="number">0</span>]    sin_wave2,</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// Added sine wave output (with unity gain)</span></span><br><span class="line">        <span class="keyword">output</span> <span class="keyword">reg</span> [DATA_WIDTH : <span class="number">0</span>]  wave_out</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Internal signal for addition result</span></span><br><span class="line">    <span class="keyword">wire</span> [DATA_WIDTH : <span class="number">0</span>] sum_result;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Perform addition (unity gain = 1)</span></span><br><span class="line">    <span class="keyword">assign</span> sum_result = &#123;sin_wave1[DATA_WIDTH-<span class="number">1</span>], sin_wave1&#125; + &#123;sin_wave2[DATA_WIDTH-<span class="number">1</span>], sin_wave2&#125;;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Register the output</span></span><br><span class="line">    <span class="keyword">always</span> @(<span class="keyword">posedge</span> clock <span class="keyword">or</span> <span class="keyword">posedge</span> reset) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">            wave_out &lt;= <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">            wave_out &lt;= sum_result;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+
+<p>在完成两个模块设计后，编写仿真文件，对其进行实例化仿真</p>
+<p><img src="/images/image.png" alt="image.png"></p>
+<h1 id="2-FFT的初步探索"><a href="#2-FFT的初步探索" class="headerlink" title="2. FFT的初步探索"></a>2. FFT的初步探索</h1><p>在 Vivado 中使用 FFT IP 核时，初学者的主要难点在于准确理解各端口的功能逻辑与配置参数的关联性。对于初步探索阶段，核心任务是完成基础配置与调用验证。</p>
+<h2 id="IP-核的引脚配置"><a href="#IP-核的引脚配置" class="headerlink" title="IP 核的引脚配置"></a>IP 核的引脚配置</h2><p>首先需根据信号特性配置关键参数，包括输入数据位宽（如 16 位，通常实部和虚部拼接）、输出数据位宽（考虑 FFT 运算增益，建议比输入宽 4-5 位以避免溢出）、相位寄存器位宽（即 FFT 点数的对数表示，如 10 对应 1024 点，决定频率分辨率）以及时钟频率（需与系统时钟一致，如 50MHz，且确保信号稳定无毛刺）。</p>
+<p>接着是基础端口的调用与连接，控制端口方面，时钟（aclk）和复位（resetn，通常低电平有效）需与系统时钟和复位信号正确连接以保证 IP 核初始化正常；输入数据端口包括输入数据总线（s_axis_data_tdata，高 16 位实部、低 16 位虚部等格式）、数据有效信号（s_axis_data_tvalid，高电平表示数据有效）、IP 核就绪信号（s_axis_data_tready，高电平表示可接收数据）；输出数据端口则有输出数据总线（m_axis_data_tdata，格式与输入对应，注意量化处理）、输出有效信号（m_axis_data_tvalid，高电平表示结果有效）、帧结束信号（m_axis_data_tlast，标记一帧数据运算完成）。</p>
+<p>在顶层仿真文件中，需生成符合位宽要求的输入数据（如正弦波采样数据，实部为信号值、虚部为 0），按时序规则驱动输入数据有效信号并检测 IP 核就绪信号以确保数据正确送入，同时捕获输出有效信号，提取输出数据并与理论 FFT 结果（可通过 MATLAB 预计算参考值）对比，以此验证配置有效性，为后续深入理解窗函数选择、流水线模式、数据格式化等高级特性奠定基础。</p>
+<h2 id="代码及仿真结果"><a href="#代码及仿真结果" class="headerlink" title="代码及仿真结果"></a>代码及仿真结果</h2><p>对FFT ip核的端口配置如下</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">xfft_0 u_fft (</span><br><span class="line">    <span class="variable">.aclk</span>(clock),</span><br><span class="line">    <span class="variable">.s_axis_config_tdata</span>(<span class="number">8&#x27;h01</span>), <span class="comment">// FFT mode</span></span><br><span class="line">    <span class="variable">.s_axis_config_tvalid</span>(<span class="number">1&#x27;b1</span>),</span><br><span class="line">    <span class="variable">.s_axis_config_tready</span>(),</span><br><span class="line">    <span class="variable">.s_axis_data_tdata</span>(&#123;<span class="number">16&#x27;b0</span>, wave_combined&#125;), <span class="comment">// Real input (zero-padded)</span></span><br><span class="line">    <span class="variable">.s_axis_data_tvalid</span>(<span class="number">1&#x27;b1</span>),</span><br><span class="line">    <span class="variable">.s_axis_data_tready</span>(),</span><br><span class="line">    <span class="variable">.s_axis_data_tlast</span>(<span class="number">1&#x27;b0</span>),</span><br><span class="line">    <span class="variable">.m_axis_data_tdata</span>(&#123;fft_imag_out, fft_real_out&#125;), <span class="comment">// &#123;imag, real&#125;</span></span><br><span class="line">    <span class="variable">.m_axis_data_tvalid</span>(fft_done),</span><br><span class="line">    <span class="variable">.m_axis_data_tready</span>(<span class="number">1&#x27;b1</span>),</span><br><span class="line">    <span class="variable">.m_axis_data_tlast</span>(),</span><br><span class="line">    <span class="variable">.event_frame_started</span>(),</span><br><span class="line">    <span class="variable">.event_tlast_unexpected</span>(),</span><br><span class="line">    <span class="variable">.event_tlast_missing</span>(),</span><br><span class="line">    <span class="variable">.event_status_channel_halt</span>(),</span><br><span class="line">    <span class="variable">.event_data_in_channel_halt</span>(),</span><br><span class="line">    <span class="variable">.event_data_out_channel_halt</span>()</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>将上文提到的Adder输出信号wave_combined接入FFT的输入端口，并根据数据位宽补充上虚部（默认为0），即可实现FFT操作</p>
+<p><img src="/images/image_1753067642319.png" alt="image.png"></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Huang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://luminghuang.com/2025/07/21/%E7%94%B5%E8%B5%9B%E5%8D%81%E6%97%A5%E8%AE%B0%EF%BC%9ADDS%E4%B8%8EFFT%E7%9A%84%E5%88%9D%E8%AF%86/">https://luminghuang.com/2025/07/21/%E7%94%B5%E8%B5%9B%E5%8D%81%E6%97%A5%E8%AE%B0%EF%BC%9ADDS%E4%B8%8EFFT%E7%9A%84%E5%88%9D%E8%AF%86/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Don't stop, won't stop, never stop.</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/DDS/"># DDS</a>
+                    
+                        <a href="/tags/FFT/"># FFT</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2025/07/22/%E3%80%90%E8%BD%AC%E3%80%91Vivado%E4%B8%ADFFT-IP%E6%A0%B8%E7%9A%84%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE/">【转】Vivado中FFT IP核的基本配置</a>
+            
+            
+            <a class="next" rel="next" href="/2025/07/20/%E5%9F%BA%E4%BA%8ETJC4832T135-011C%E7%9A%84FPGA%E9%80%9A%E4%BF%A1%E6%98%BE%E7%A4%BA/">基于TJC4832T135_011C的FPGA通信显示</a>
+            
+        </section>
+
+        <!-- Giscus 评论区挂载点 -->
+<div id="giscus-container" style="margin-top: 2.5rem;"></div>
+
+<!-- Giscus 动态加载脚本：初始加载 + 明暗主题切换 -->
+<script>
+  function createGiscus(theme) {
+    const giscusContainer = document.getElementById('giscus-container');
+    if (!giscusContainer) return;
+
+    // 清除旧的评论 iframe
+    giscusContainer.innerHTML = '';
+
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+
+    // 替换为你的 GitHub 仓库信息（格式：username/repo）
+    script.setAttribute('data-repo', 'StanHuanng/stanhuang.github.io');
+
+   // 替换为你的 repo-id 和 category-id（在 giscus.app 配置页面生成）
+    script.setAttribute('data-repo-id', 'R_kgDOPPSsDg');
+    script.setAttribute('data-category', 'Announcements');
+    script.setAttribute('data-category-id', 'DIC_kwDOPPSsDs4CtPSj');
+
+    // 其他常规推荐设置
+    script.setAttribute('data-mapping', 'pathname');           // 用页面路径匹配评论帖
+    script.setAttribute('data-strict', '0');                   // 若无匹配帖则创建新帖
+    script.setAttribute('data-reactions-enabled', '1');        // 启用表情反应
+    script.setAttribute('data-emit-metadata', '0');            // 不输出元数据
+    script.setAttribute('data-input-position', 'top');         // 输入框在评论上方
+    script.setAttribute('data-theme', theme);                
+    script.setAttribute('data-lang', 'zh-CN');                 // 中文界面
+    script.setAttribute('crossorigin', 'anonymous');           // 跨域资源安全
+    script.async = true;                                       
+     
+    giscusContainer.appendChild(script);
+  }
+
+  function getCurrentTheme() {
+    return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 页面首次加载，根据当前主题挂载评论
+    createGiscus(getCurrentTheme());
+
+    // 监听按钮点击切换主题 → 重载评论区
+    const buttons = [
+      document.querySelector('.toggleBtn'),
+      document.getElementById('mobile-toggle-theme')
+    ];
+    buttons.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          createGiscus(getCurrentTheme());
+        }, 400); // 稍作延迟，确保 class 切换完毕
+      });
+    });
+
+    // 监听 body class 改变（保险方案）
+    const observer = new MutationObserver(() => {
+      createGiscus(getCurrentTheme());
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  });
+</script>
+
+    </article>
+</div>
+
+<script>
+!
+function() {
+    function n(n, e, t) {
+        return n.getAttribute(e) || t
+    }
+    function e(n) {
+        return document.getElementsByTagName(n)
+    }
+    function t() {
+        var t = e("script"),
+        o = t.length,
+        i = t[o - 1];
+
+        const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+        if(theme==="dark")
+            color = "255,255,255";
+        else
+            color = "0,0,0";
+
+        return {
+            l: o,
+            z: n(i, "zIndex", -1),     //置于主页面背后
+            o: n(i, "opacity", .5),     //线条透明度
+            c: n(i, "color", color),  //线条颜色
+            n: n(i, "count", 100)    //线条数量
+        }
+    }
+    function o() {
+        a = m.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+        c = m.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+    }
+    function i() {
+        r.clearRect(0, 0, a, c);
+        var n, e, t, o, m, l;
+        s.forEach(function(i, x) {
+            for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 : 1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1, 1), e = x + 1; e < u.length; e++) n = u[e],
+            null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o, i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t / 2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y), r.lineTo(n.x, n.y), r.stroke()))
+        }),
+        x(i)
+    }
+    var a, c, u, m = document.createElement("canvas"),
+    d = t(),
+    l = "c_n" + d.l,
+    r = m.getContext("2d"),
+    x = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+    function(n) {
+        window.setTimeout(n, 1e3 / 45)
+    },
+    w = Math.random,
+    y = {
+        x: null,
+        y: null,
+        max: 2e4
+    };
+    m.id = l,
+    m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z + ";opacity:" + d.o,
+    e("body")[0].appendChild(m),
+    o(),
+    window.onresize = o,
+    window.onmousemove = function(n) {
+        n = n || window.event,
+        y.x = n.clientX,
+        y.y = n.clientY
+    },
+    window.onmouseout = function() {
+        y.x = null,
+        y.y = null
+    };
+    for (var s = [], f = 0; d.n > f; f++) {
+       const toggleDesktop = document.querySelector('label[for="switch_default"]');
+const toggleMobile = document.querySelector('#mobile-toggle-theme');
+
+if (toggleDesktop) {
+    toggleDesktop.addEventListener('click', function() {
+        location.reload();
+    });
+}
+
+if (toggleMobile) {
+    toggleMobile.addEventListener('click', function() {
+        location.reload();
+    });
+}
+        var h = w() * a,
+        g = w() * c,
+        v = 2 * w() - 1,
+        p = 2 * w() - 1;
+        s.push({
+            x: h,
+            y: g,
+            xa: v,
+            ya: p,
+            max: 6e3
+        })
+    }
+    u = s.concat([y]),
+    setTimeout(function() {
+        i()
+    },
+    100)
+} ();
+</script>  
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Huang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
