@@ -13,7 +13,7 @@
 
 
 
-<title>MSP-430F5529LP的环境配置常见问题 | Huang&#39;s Blog</title>
+<title>MSP-430F5529LP无法找到USB驱动的解决方法 | Huang&#39;s Blog</title>
 
 
 
@@ -139,7 +139,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">MSP-430F5529LP的环境配置常见问题</h1>
+            <h1 class="post-title">MSP-430F5529LP无法找到USB驱动的解决方法</h1>
             <span id="busuanzi_container_site_pv">本贴阅读量<span id="busuanzi_value_site_pv"></span>次</span>            
              
                 <div class="post-meta">
@@ -165,26 +165,29 @@
         </header>
 
         <div class="post-content">
-            <p><strong>问题1：无法在设备管理器中找到 MSP 的 usb 驱动，同时无法完成 CSS 内部的烧录操作</strong>****</p>
+            <p><strong>问题：无法在设备管理器中找到 MSP 的 usb 驱动，同时无法完成 CSS 内部的烧录操作</strong>****</p>
 <blockquote>
 <p>MSP430: Error initializing emulator: One of the connected MSP-FETs &#x2F; eZ-FETs debuggers needs recovery. Select ‘Recover’ to start the recovery process.  Note: Only one MSP-FET &#x2F; eZ-FET debugger can be connected to your system during recovery.<br>MSP430: Error: MSP-FET &#x2F; eZ-FET recovery failed</p>
 </blockquote>
 <ul>
-<li>参考网站<a target="_blank" rel="noopener" href="https://bbs.eeworld.com.cn/thread-334052-1-1.html">win7 下 LaunchPad 驱动安装指南 - 微控制器 MCU - 电子工程世界-论坛</a></li>
+<li>方法1：参考网站<a target="_blank" rel="noopener" href="https://bbs.eeworld.com.cn/thread-334052-1-1.html">win7 下 LaunchPad 驱动安装指南 - 微控制器 MCU - 电子工程世界-论坛</a></li>
 </ul>
 <p>安装 usbser.sys 放至 windows&#x2F;win32&#x2F;driver 中，并替换原有文件，仍未解决</p>
 <ul>
-<li><strong>禁用驱动程序强制签名模式允许安装未经过数字签名的驱动程序</strong></li>
+<li>方法2：禁用驱动程序强制签名模式允许安装未经过数字签名的驱动程序</li>
 </ul>
-<p>通过开启 windows 禁用驱动强制签名模式后，在设备管理器页面手动添加驱动</p>
+<p>首先开启 windows 禁用驱动强制签名模式(以管理员模式运行），然后重启电脑</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bcdedit.exe /<span class="built_in">set</span> nointegritychecks off</span><br></pre></td></tr></table></figure>
+
+<p>在设备管理器页面手动添加驱动</p>
 <p><em>C:\Windows\System32\DriverStore\FileRepository\xds110_debug.inf_amd64_c3db6584de66afb3</em></p>
 <p>在设备管理器页面打开“显示隐藏的设备”后，发现 MSP DEBUG INTERFACE 位于 COM 端口栏，</p>
 <ul>
-<li>安装MSP Flasher尝试进行修复</li>
+<li>方法3：安装MSP Flasher尝试进行修复</li>
 </ul>
 <p>在Ti的官网下载MSP firmware包，在firmware包中有一个文件夹为MSP Flasher，点击运行后可以执行recover操作</p>
 <ul>
-<li>借助其他人正常的驱动</li>
+<li>方法4：借助其他人正常的驱动</li>
 </ul>
 <p>找到驱动更新程序所存放的文件路径，将其中包含的文件全部打包，在其他位置新建完全一样的文件夹后放入源文件，卸载驱动程序，进行手动重装（此方法前提是未禁用驱动程序强制签名）</p>
 
