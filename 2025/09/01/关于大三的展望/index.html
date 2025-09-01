@@ -13,7 +13,7 @@
 
 
 
-<title>category | Huang&#39;s Blog</title>
+<title>关于大三的展望 | Huang&#39;s Blog</title>
 
 
 
@@ -132,7 +132,165 @@
     }
 </script>
             <div class="main">
+                <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">关于大三的展望</h1>
+            <span id="busuanzi_container_site_pv">本贴阅读量<span id="busuanzi_value_site_pv"></span>次</span>            
+             
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Huang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 1, 2025&nbsp;&nbsp;13:32:16</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Self-Reflection/">Self-Reflection</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>两个月的假期转瞬即逝，回首过去的两个月，我自认为是比较充实也比较有收获的，在学习中提升自己所获得的成就感是和玩相比完全不同的感受</p>
+<p>经过两年的在电子信息领域的学习，我可能算正式迈入了这一领域的门槛吧，新的一年希望我可以更好的学习，尽早确定我想专注的方向</p>
+<p>希望我在新的学年，可以保持每周写博客的习惯，可能是总结本周所学，或者是分享收获与感悟，总之保持下去这个习惯，同时专注在FPGA的学习与进一步开发中</p>
+<p>Ever Evolving！</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
                 
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Huang</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Don't stop, won't stop, never stop.</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E9%9A%8F%E7%AC%94/"># 随笔</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2025/08/18/%E5%9F%BA%E4%BA%8EMSPM0G3507%E5%AE%9E%E7%8E%B0%E7%9A%84%E7%94%B5%E8%B7%AF%E6%A8%A1%E5%9E%8B%E6%8E%A2%E7%A9%B6%E8%A3%85%E7%BD%AE/">基于MSPM0G3507实现的电路模型探究装置</a>
+            
+        </section>
+
+        <!-- Giscus 评论区挂载点 -->
+<div id="giscus-container" style="margin-top: 2.5rem;"></div>
+
+<!-- Giscus 动态加载脚本：初始加载 + 明暗主题切换 -->
+<script>
+  function createGiscus(theme) {
+    const giscusContainer = document.getElementById('giscus-container');
+    if (!giscusContainer) return;
+
+    // 清除旧的评论 iframe
+    giscusContainer.innerHTML = '';
+
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+
+    // 替换为你的 GitHub 仓库信息（格式：username/repo）
+    script.setAttribute('data-repo', 'StanHuanng/stanhuang.github.io');
+
+   // 替换为你的 repo-id 和 category-id（在 giscus.app 配置页面生成）
+    script.setAttribute('data-repo-id', 'R_kgDOPPSsDg');
+    script.setAttribute('data-category', 'Announcements');
+    script.setAttribute('data-category-id', 'DIC_kwDOPPSsDs4CtPSj');
+
+    // 其他常规推荐设置
+    script.setAttribute('data-mapping', 'pathname');           // 用页面路径匹配评论帖
+    script.setAttribute('data-strict', '0');                   // 若无匹配帖则创建新帖
+    script.setAttribute('data-reactions-enabled', '1');        // 启用表情反应
+    script.setAttribute('data-emit-metadata', '0');            // 不输出元数据
+    script.setAttribute('data-input-position', 'top');         // 输入框在评论上方
+    script.setAttribute('data-theme', theme);                
+    script.setAttribute('data-lang', 'zh-CN');                 // 中文界面
+    script.setAttribute('crossorigin', 'anonymous');           // 跨域资源安全
+    script.async = true;                                       
+     
+    giscusContainer.appendChild(script);
+  }
+
+  function getCurrentTheme() {
+    return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 页面首次加载，根据当前主题挂载评论
+    createGiscus(getCurrentTheme());
+
+    // 监听按钮点击切换主题 → 重载评论区
+    const buttons = [
+      document.querySelector('.toggleBtn'),
+      document.getElementById('mobile-toggle-theme')
+    ];
+    buttons.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          createGiscus(getCurrentTheme());
+        }, 400); // 稍作延迟，确保 class 切换完毕
+      });
+    });
+
+    // 监听 body class 改变（保险方案）
+    const observer = new MutationObserver(() => {
+      createGiscus(getCurrentTheme());
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  });
+</script>
+
+    </article>
+</div>
+
+
 <script>
 !
 function() {
@@ -236,116 +394,6 @@ if (toggleMobile) {
     100)
 } ();
 </script>  
-
-
-    <div class="container">
-        <div class="post-wrap categories">
-            <h2 class="post-title">-&nbsp;Categories&nbsp;-</h2>
-            <div class="categories-card">
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/MCU/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    MCU
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/23/MSP-430F5529LP%E6%97%A0%E6%B3%95%E6%89%BE%E5%88%B0USB%E9%A9%B1%E5%8A%A8%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">MSP-430F5529LP无法找到USB驱动的解决方法</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/24/%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8MSP-M0G3507%E4%B8%8E%E9%99%B6%E6%99%B6%E9%A9%B0%E4%B8%B2%E5%8F%A3%E5%B1%8F%E7%9A%84%E9%80%9A%E4%BF%A1/">快速入门MSP-M0G3507与陶晶驰串口屏的通信</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/27/%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8MSPM0%E8%8A%AF%E7%89%87%20ADC%E9%87%87%E9%9B%86%E4%B8%8EDMA%E6%90%AC%E8%BF%90%E6%95%B0%E6%8D%AE/">快速入门MSPM0芯片 ADC采集与DMA搬运数据</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/08/18/%E5%9F%BA%E4%BA%8EMSPM0G3507%E5%AE%9E%E7%8E%B0%E7%9A%84%E7%94%B5%E8%B7%AF%E6%A8%A1%E5%9E%8B%E6%8E%A2%E7%A9%B6%E8%A3%85%E7%BD%AE/">基于MSPM0G3507实现的电路模型探究装置</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/Self-Reflection/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    Self-Reflection
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/09/01/%E5%85%B3%E4%BA%8E%E5%A4%A7%E4%B8%89%E7%9A%84%E5%B1%95%E6%9C%9B/">关于大三的展望</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/FPGA/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    FPGA
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/22/%E3%80%90%E8%BD%AC%E3%80%91Vivado%E4%B8%ADFFT-IP%E6%A0%B8%E7%9A%84%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE/">【转】Vivado中FFT IP核的基本配置</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2025/07/21/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8BFPGA%E4%B8%AD%E7%9A%84DDS%E4%B8%8EFFT%20IP%E6%A0%B8/">如何快速上手FPGA中的DDS与FFT IP核</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-            </div>
-
-        </div>
-    </div>
-
             </div>
             <footer id="footer" class="footer">
     <div class="copyright">
